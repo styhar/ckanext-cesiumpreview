@@ -14,6 +14,7 @@ class CesiumPreview(p.SingletonPlugin):
     p.implements(p.IConfigurer, inherit=True)
     p.implements(p.IConfigurable, inherit=True)
     p.implements(p.ITemplateHelpers)
+    p.implements(p.IResourcePreview, inherit=True)
     p.implements(p.IResourceView, inherit=True)
 
     proxy_is_enabled = False
@@ -46,7 +47,7 @@ class CesiumPreview(p.SingletonPlugin):
             return {'can_preview': False}
 
         result = {'can_preview': True, 'quality': 2}
-        if not any(resource.get('on_same_domain'), self.proxy_is_enabled):
+        if not any([resource.get('on_same_domain'), self.proxy_is_enabled]):
             result['fixable'] = 'Enable resource_proxy',
         return result
 
