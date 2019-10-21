@@ -1,22 +1,28 @@
 {% extends 'dataviewer/base.html' %}
 
 {% block page %}
-<script>
-{% set package = c.package or h.get_package_data(c.id) %}
-{% if package.spatial %}
-    var spatial = '{{ package.spatial.replace("\n","")|safe }}';
-{% else %}
-    var spatial = '';
-{% endif %}
+    <script>
+     {% set package = c.package or h.get_package_data(c.id) %}
+     {% if package.spatial %}
+     var spatial = '{{ package.spatial.replace("\n","")|safe }}';
+     {% else %}
+     var spatial = '';
+     {% endif %}
+    </script>
 
-</script>
-  <div>
-    <pre data-module="cesiumpreview">
-      <div class="loading">
-        {{ _('Loading...') }}
-      </div>
-    </pre>
-  </div>
+    <div>
+        <pre
+            data-module="cesiumpreview"
+            data-module-server="{{ h.cesiumpreview_server_url('default') }}"
+            {% if package.spatial %}
+            data-module-home-camera="{{ package.spatial.replace("\n","") }}"
+            {% endif %}
+        >
+            <div class="loading">
+                {{ _('Loading...') }}
+            </div>
+        </pre>
+    </div>
 
-  {% resource 'ckanext-cesiumpreview/main' %}
+    {% resource 'ckanext-cesiumpreview/main' %}
 {% endblock %}

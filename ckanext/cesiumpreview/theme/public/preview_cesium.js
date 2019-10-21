@@ -1,79 +1,95 @@
 // json preview module
-ckan.module('cesiumpreview', function (jQuery, _) {
-    return {
-        initialize: function () {
-            var self = this;
-
-            var vis_server = 'https://nationalmap.gov.au/';
-
-            var config = {
-                "version": "0.0.03",
-                "initSources": [{
-                    "catalog": [{
-                        "type": "group",
-                        "name": "User-Added Data",
-                        "description": "The group for data that was added by the user via the Add Data panel.",
-                        "isUserSupplied": true,
-                        "isOpen": true,
-                        "items": [{
-                            "type": "kml",
-                            "name": "User Data",
-                            "isUserSupplied": true,
-                            "isOpen": true,
-                            "isEnabled": true,
-                            "url": "http://"
-                        }]
-                    }],
-                    "catalogIsUserSupplied": true,
-                    "homeCamera": {
-                        "west": 105,
-                        "south": -45,
-                        "east": 155,
-                        "north": -5
-                    }
-
-                }
+ckan.module("cesiumpreview", function(jQuery, _) {
+  return {
+    options: {
+      server: "https://nationalmap.gov.au/",
+      homeCamera: null
+    },
+    _getInitialConfig: function() {
+      return {
+        version: "0.0.03",
+        initSources: [
+          {
+            catalog: [
+              {
+                type: "group",
+                name: "User-Added Data",
+                description:
+                  "The group for data that was added by the user via the Add Data panel.",
+                isUserSupplied: true,
+                isOpen: true,
+                items: [
+                  {
+                    type: "kml",
+                    name: "User Data",
+                    isUserSupplied: true,
+                    isOpen: true,
+                    isEnabled: true,
+                    url: "http://"
+                  }
                 ]
-
-            };
-            // load dataset spatial extent as default home camera if available
-            if (spatial != '') {
-                extent = geojsonExtent(JSON.parse(spatial)); //[WSEN]
-                if (extent[0] != extent[2]) {
-                    config["initSources"][0]['homeCamera']['west'] = extent[0];
-                    config["initSources"][0]['homeCamera']['south'] = extent[1];
-                    config["initSources"][0]['homeCamera']['east'] = extent[2];
-                    config["initSources"][0]['homeCamera']['north'] = extent[3];
-                }
+              }
+            ],
+            catalogIsUserSupplied: true,
+            homeCamera: {
+              west: 105,
+              south: -45,
+              east: 155,
+              north: -5
             }
+          }
+        ]
+      };
+    },
+    initialize: function() {
+      var self = this;
 
-            config["initSources"][0]['catalog'][0]['items'][0]['url'] = preload_resource['url'];
-            if (preload_resource['url'].indexOf('http') !== 0) {
-                config["initSources"][0]['catalog'][0]['items'][0]['url'] = "http:" + preload_resource['url'];
-            }
-            config["initSources"][0]['catalog'][0]['items'][0]['type'] = preload_resource['format'].toLowerCase();
-
-            if (config["initSources"][0]['catalog'][0]['items'][0]['type'] == 'wms' || config["initSources"][0]['catalog'][0]['items'][0]['type'] == 'wfs') {
-                // if wms_layer specified in resource, display that layer/layers by default
-                if (typeof preload_resource['wms_layer'] != 'undefined' && preload_resource['wms_layer'] != '') {
-                    config["initSources"][0]['catalog'][0]['items'][0]['layers'] = preload_resource['wms_layer'];
-                }
-                else {
-                    config["initSources"][0]['catalog'][0]['items'][0]['type'] = config["initSources"][0]['catalog'][0]['items'][0]['type'] + '-getCapabilities';
-                }
-            }
-            if (config["initSources"][0]['catalog'][0]['items'][0]['type'] == 'aus-geo-csv' || config["initSources"][0]['catalog'][0]['items'][0]['type'] == 'csv-geo-au') {
-                config["initSources"][0]['catalog'][0]['items'][0]['type'] = 'csv';
-            }
-            var encoded_config = encodeURIComponent(JSON.stringify(config));
-            var style = 'height: 600px; width: 100%; border: none;';
-            var display = 'allowFullScreen mozAllowFullScreen webkitAllowFullScreen';
-
-            var html = '<iframe src="' + vis_server + '#clean&hideExplorerPanel=1&start=' + encoded_config + '" style="' + style + '" ' + display + '></iframe>';
-
-            console.log(html);
-
-            self.el.html(html);
+      var config = this._getInitialConfig();
+      if (this.options.homeCamera) {
+        var extent = window.geojsonExtent(this.options.homeCamera); //[WSEN]
+        var home = config["initSources"][0]["homeCamera"];
+        if (extent[0] != extent[2]) {
+          home["west"] = extent[0];
+          home["south"] = extent[1];
+          home["east"] = extent[2];
+          home["north"] = extent[3];
         }
-    };
+      }
+      var preload_resource = window.preload_resource;
+      var item = config["initSources"][0]["catalog"][0]["items"][0];
+      item["url"] = preload_resource["url"];
+      if (preload_resource["url"].indexOf("http") !== 0) {
+        item["url"] = "http:" + preload_resource["url"];
+      }
+      item["type"] = preload_resource["format"].toLowerCase();
+
+      if (item["type"] == "wms" || item["type"] == "wfs") {
+        // if wms_layer specified in resource, display that layer/layers by default
+        if (preload_resource["wms_layer"]) {
+          item["layers"] = preload_resource["wms_layer"];
+        } else {
+          item["type"] = item["type"] + "-getCapabilities";
+        }
+      }
+      if (item["type"] == "aus-geo-csv" || item["type"] == "csv-geo-au") {
+        item["type"] = "csv";
+      }
+      var encoded_config = encodeURIComponent(JSON.stringify(config));
+      var style = "height: 600px; width: 100%; border: none;";
+      var display = "allowFullScreen mozAllowFullScreen webkitAllowFullScreen";
+
+      var html =
+        '<iframe src="' +
+        this.options.server +
+        "#clean&hideExplorerPanel=1&start=" +
+        encoded_config +
+        '" style="' +
+        style +
+        '" ' +
+        display +
+        "></iframe>";
+
+      self.el.html(html);
+    }
+  };
 });

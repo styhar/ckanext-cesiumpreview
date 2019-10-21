@@ -1,64 +1,68 @@
+# -*- coding: utf-8 -*-
+
+import os
 import logging
 
 import ckan.plugins as p
-
-log = logging.getLogger(__name__)
-
 from ckanext.cesiumpreview.helpers import get_helpers
 
-try:
-    import os
-    import ckanext.resourceproxy.plugin as proxy
-except ImportError:
-    pass
+log = logging.getLogger(__name__)
+_cesium_formats = ['wms', 'wfs', 'kml', 'kmz', 'gjson', 'geojson', 'czml']
 
 
 class CesiumPreview(p.SingletonPlugin):
-    '''This extension adds Cesium. '''
     p.implements(p.IConfigurer, inherit=True)
     p.implements(p.IConfigurable, inherit=True)
     p.implements(p.ITemplateHelpers)
-    if p.toolkit.check_ckan_version(min_version='2.3'):
-        p.implements(p.IResourceView, inherit=True)
-    else:
-        p.implements(p.IResourcePreview, inherit=True)
+    p.implements(p.IResourceView, inherit=True)
 
-    Cesium_Formats = ['wms', 'wfs', 'kml', 'kmz', 'gjson', 'geojson', 'czml', 'aus-geo-csv', 'csv-geo-au']
     proxy_is_enabled = False
+
+    # IConfigurer
 
     def update_config(self, config):
         p.toolkit.add_public_directory(config, 'theme/public')
         p.toolkit.add_template_directory(config, 'theme/templates')
         p.toolkit.add_resource('theme/public', 'ckanext-cesiumpreview')
 
+    # IConfigurable
+
     def configure(self, config):
-        enabled = config.get('ckan.resource_proxy_enabled', False)
-        self.proxy_is_enabled = enabled
+        self.proxy_is_enabled = config.get('ckan.resource_proxy_enabled',
+                                           False)
+        self.cesium_formats = p.toolkit.aslist(
+            config.get('cesiumpreview.cesium.formats', _cesium_formats))
+
+    # IResourceView
 
     def can_preview(self, data_dict):
         resource = data_dict['resource']
         format_lower = resource['format'].lower()
-        if format_lower == '':
+        if not format_lower:
             format_lower = os.path.splitext(resource['url'])[1][1:].lower()
-        if format_lower in self.Cesium_Formats:
-            if resource.get('on_same_domain') or self.proxy_is_enabled:
-                return {'can_preview': True, 'quality': 2}
-            else:
-                return {'can_preview': True,
-                        'fixable': 'Enable resource_proxy',
-                        'quality': 2}
-        return {'can_preview': False}
+        if format_lower not in self.cesium_formats:
+            return {'can_preview': False}
+
+        result = {'can_preview': True, 'quality': 2}
+        if not any(resource.get('on_same_domain'), self.proxy_is_enabled):
+            result['fixable'] = 'Enable resource_proxy',
+        return result
 
     def info(self):
-        return {'name': 'cesium_view', 'title': 'National Map', 'always_available': True,
-                'default_title': 'National Map', 'icon': 'globe'}
+        return {
+            'name': 'cesium_view',
+            'title': 'National Map',
+            'always_available': True,
+            'default_title': 'National Map',
+            'icon': 'globe'
+        }
 
     def can_view(self, data_dict):
         resource = data_dict['resource']
         format_lower = resource.get('format', '').lower()
         if format_lower == '':
             format_lower = os.path.splitext(resource['url'])[1][1:].lower()
-        if format_lower in self.Cesium_Formats:
+        if format_lower in self.cesium_formats:
             return True
         return False
 
@@ -68,6 +72,7 @@ class CesiumPreview(p.SingletonPlugin):
     def view_template(self, context, data_dict):
         return 'cesium.html'
 
-    ## ITemplateHelpers
+    # ITemplateHelpers
+
     def get_helpers(self):
         return get_helpers()
