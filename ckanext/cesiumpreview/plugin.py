@@ -17,6 +17,7 @@ class CesiumPreview(p.SingletonPlugin):
     p.implements(p.IResourceView, inherit=True)
 
     proxy_is_enabled = False
+    _national_map_title = None
 
     # IConfigurer
 
@@ -32,6 +33,7 @@ class CesiumPreview(p.SingletonPlugin):
                                            False)
         self.cesium_formats = p.toolkit.aslist(
             config.get('cesiumpreview.cesium.formats', _cesium_formats))
+        self._national_map_title = config.get('cesiumpreview.view.title', 'National Map')
 
     # IResourceView
 
@@ -51,9 +53,9 @@ class CesiumPreview(p.SingletonPlugin):
     def info(self):
         return {
             'name': 'cesium_view',
-            'title': 'National Map',
+            'title': self._national_map_title,
             'always_available': True,
-            'default_title': 'National Map',
+            'default_title': self._national_map_title,
             'icon': 'globe'
         }
 

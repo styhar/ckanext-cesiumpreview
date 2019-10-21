@@ -20,3 +20,6 @@ CKAN config file(default values provided as example):
 
     # NationalMap service
     cesiumpreview.server.default.url = https://nationalmap.gov.au/
+
+    # Default title for automatically created views
+    cesiumpreview.view.title = National Map
