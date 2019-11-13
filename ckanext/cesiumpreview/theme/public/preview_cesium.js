@@ -45,6 +45,7 @@ ckan.module("cesiumpreview", function(jQuery, _) {
       var self = this;
 
       var config = this._getInitialConfig();
+
       if (this.options.homeCamera) {
         var extent = window.geojsonExtent(this.options.homeCamera); //[WSEN]
         var home = config["initSources"][0]["homeCamera"];

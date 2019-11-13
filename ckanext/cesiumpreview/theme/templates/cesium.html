@@ -16,6 +16,8 @@
             data-module-server="{{ h.cesiumpreview_server_url('default') }}"
             {% if package.spatial %}
             data-module-home-camera="{{ package.spatial.replace("\n","") }}"
+            {% else %}
+            data-module-home-camera="{{ h.cesiumpreview_extent('default') or 'false' }}"
             {% endif %}
         >
             <div class="loading">
