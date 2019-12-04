@@ -14,11 +14,9 @@
         <pre
             data-module="cesiumpreview"
             data-module-server="{{ h.cesiumpreview_server_url('default') }}"
-            {% if package.spatial %}
-            data-module-home-camera="{{ package.spatial.replace("\n","") }}"
-            {% else %}
+            {% block cesium_home_camera %}
             data-module-home-camera="{{ h.cesiumpreview_extent('default') or 'false' }}"
-            {% endif %}
+            {% endblock cesium_home_camera %}
         >
             <div class="loading">
                 {{ _('Loading...') }}
