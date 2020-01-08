@@ -67,7 +67,7 @@ ckan.module('cesiumpreview', function (jQuery, _) {
                 config["initSources"][0]['catalog'][0]['items'][0]['type'] = 'csv';
             }
             var encoded_config = encodeURIComponent(JSON.stringify(config));
-            var style = 'height: 600px; width: 100%; border: none;';
+            var style = 'height: 600px; width: 100%; border: none; min-width: 100vw;';
             var display = 'allowFullScreen mozAllowFullScreen webkitAllowFullScreen';
 
             var html = '<iframe src="' + vis_server + '#clean&hideExplorerPanel=1&start=' + encoded_config + '" style="' + style + '" ' + display + '></iframe>';
