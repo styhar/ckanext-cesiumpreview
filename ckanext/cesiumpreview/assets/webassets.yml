@@ -1,0 +1,15 @@
+cesium_js:
+  filters: rjsmin
+  output: ckanext-cesiumpreview/cesium-js.js
+  extra:
+    preload:
+      - base/main
+  contents:
+    - cesiumpreview_preview_cesium.js
+    - cesiumpreview_geojson_extent.js
+
+cesium_css:
+  filters: yui_css
+  output: ckanext-cesiumpreview/cesium-css.css
+  contents:
+    - cesiumpreview_text.css
