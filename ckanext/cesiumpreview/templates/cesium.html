@@ -1,0 +1,29 @@
+{% extends 'dataviewer/base.html' %}
+
+{% block page %}
+  <script>
+    {% set package = package or h.get_package_data(package.id) %}
+    {% if package.spatial %}
+      var spatial = '{{ package.spatial.replace("\n","")|safe }}';
+    {% else %}
+      var spatial = '';
+    {% endif %}
+  </script>
+
+  <div>
+    <pre
+      data-module="cesiumpreview"
+      data-module-server="{{ h.cesiumpreview_server_url('default') }}"
+      {% block cesium_home_camera %}
+      data-module-home-camera="{{ h.cesiumpreview_extent('default') or 'false' }}"
+      {% endblock cesium_home_camera %}
+      >
+      <div class="loading">
+        {{ _('Loading...') }}
+      </div>
+    </pre>
+  </div>
+
+  {% set type = 'asset' if h.ckan_version() > '2.9' else 'resource' %}
+  {% include 'snippets/cesium_' ~ type ~ '.html' %}
+{% endblock %}
