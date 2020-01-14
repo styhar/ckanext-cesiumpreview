@@ -5,11 +5,10 @@ cesium_js:
     preload:
       - base/main
   contents:
-    - cesiumpreview_preview_cesium.js
-    - cesiumpreview_geojson_extent.js
+    - js/cesiumpreview_preview_cesium.js
+    - js/cesiumpreview_geojson_extent.js
 
 cesium_css:
-  filters: yui_css
   output: ckanext-cesiumpreview/cesium-css.css
   contents:
-    - cesiumpreview_text.css
+    - css/cesiumpreview_text.css

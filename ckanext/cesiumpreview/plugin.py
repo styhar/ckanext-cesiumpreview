@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
 import os
 import logging
 
@@ -24,16 +23,18 @@ class CesiumPreview(p.SingletonPlugin):
 
 	def update_config(self, config):
 		p.toolkit.add_template_directory(config, "templates")
-		p.toolkit.add_resource("assets", "ckanext-cesiumpreview")
+		p.toolkit.add_resource("public", "ckanext-cesiumpreview")
+		p.toolkit.add_public_directory(config, "public")
 
 	# IConfigurable
 
 	def configure(self, config):
-		self.proxy_is_enabled = config.get("ckan.resource_proxy_enabled",
-										   False)
+		self.proxy_is_enabled = config.get(
+			"ckan.resource_proxy_enabled", False)
 		self.cesium_formats = p.toolkit.aslist(
 			config.get("cesiumpreview.cesium.formats", _cesium_formats))
-		self._national_map_title = config.get("cesiumpreview.view.title", "National Map")
+		self._national_map_title = config.get(
+			"cesiumpreview.view.title", "National Map")
 
 	# IResourceView
 
