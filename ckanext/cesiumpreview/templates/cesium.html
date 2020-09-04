@@ -11,17 +11,23 @@
   </script>
 
   <div>
-    <pre
-      data-module="cesiumpreview"
-      data-module-server="{{ h.cesiumpreview_server_url('default') }}"
-      {% block cesium_home_camera %}
-      data-module-home-camera="{{ h.cesiumpreview_extent('default') or 'false' }}"
-      {% endblock cesium_home_camera %}
-      >
-      <div class="loading">
-        {{ _('Loading...') }}
-      </div>
-    </pre>
+    {% block preview %}
+      <pre
+        {% block pre_inner %}
+          data-module="cesiumpreview"
+          data-module-server="{{ h.cesiumpreview_server_url('default') }}"
+          {% block cesium_home_camera %}
+            data-module-home-camera="{{ h.cesiumpreview_extent('default') or 'false' }}"
+          {% endblock cesium_home_camera %}
+        {% endblock pre_inner %}
+        >
+        {% block preview_inner %}
+          <div class="loading">
+            {{ _('Loading...') }}
+          </div>
+        {% endblock preview_inner %}
+      </pre>
+    {% endblock preview %}
   </div>
 
   {% set type = 'asset' if h.ckan_version() > '2.9' else 'resource' %}
